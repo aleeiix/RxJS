@@ -1,5 +1,5 @@
 import { displayLog } from './utils';
-import { of } from 'rxjs';
+import { of, range } from 'rxjs';
 
 export default () => {
     const source = of(1, 2, 3, 4, 5, 6);
@@ -11,5 +11,6 @@ export default () => {
             return 'Hi';
         }
     );
-    const subscription = source2.subscribe(res => displayLog(res));
+    const source3 = range(3, 10)
+    const subscription = source3.subscribe(res => displayLog(res));
 }
