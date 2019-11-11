@@ -1,6 +1,6 @@
 import { displayLog } from './utils';
 import { fromEvent } from 'rxjs';
-import { map, first, take, takeWhile } from 'rxjs/operators'
+import { map, first, take, takeWhile, last, takeLast, skip } from 'rxjs/operators'
 
 export default () => {
     /** start coding */
@@ -8,7 +8,7 @@ export default () => {
     const subscription = fromEvent(grid, 'click')
     .pipe(
         map((evt) => [Math.floor(evt.offsetX / 50), Math.floor(evt.offsetY / 50)]),
-        takeWhile(([col, row]) => col > 3)
+        skip(5)
     ).subscribe((evt) => displayLog(evt));
 
     /** end coding */
