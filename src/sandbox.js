@@ -13,12 +13,7 @@ export default () => {
   //observable that returns scroll (from top) on scroll events
   const scroll$ = fromEvent(document, "scroll").pipe(
     map(() => docElement.scrollTop),
-    tap(evt => console.log("[scroll]: ", evt)),
-    pairwise(),
-    tap(([previous, current]) => {
-      updateDisplay(current > previous ? "DESC" : "ASC");
-    }),
-    map(([previous, current]) => current)
+    tap(evt => console.log("[scroll]: ", evt))
   );
 
   //observable that returns the amount of page scroll progress
