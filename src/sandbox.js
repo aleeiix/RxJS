@@ -1,6 +1,6 @@
 import { updateDisplay } from "./utils";
 import { fromEvent } from "rxjs";
-import { map, tap, pairwise } from "rxjs/operators";
+import { map, tap, share } from "rxjs/operators";
 
 export default () => {
   /** start coding */
@@ -21,11 +21,16 @@ export default () => {
     map(evt => {
       const docHeight = docElement.scrollHeight - docElement.clientHeight;
       return (evt / docHeight) * 100;
-    })
+    }),
+    share()
   );
 
   //subscribe to scroll progress to paint a progress bar
   const subscription = scrollProgress$.subscribe(updateProgressBar);
+
+  const subscription2 = scrollProgress$.subscribe(val => {
+    updateDisplay(`${Math.floor(val)} %`);
+  });
 
   /** end coding */
 };
