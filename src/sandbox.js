@@ -34,5 +34,7 @@ export default () => {
     updateDisplay(`${Math.floor(val)} %`);
   });
 
+  console.log(scrollProgressHot$.getValue());
+
   /** end coding */
 };
