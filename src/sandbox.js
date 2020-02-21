@@ -1,5 +1,5 @@
 import { updateDisplay } from "./utils";
-import { fromEvent, Subject } from "rxjs";
+import { fromEvent, Subject, BehaviorSubject } from "rxjs";
 import { map, tap, share } from "rxjs/operators";
 
 export default () => {
@@ -24,7 +24,7 @@ export default () => {
     })
   );
 
-  const scrollProgressHot$ = new Subject();
+  const scrollProgressHot$ = new BehaviorSubject(0);
   scrollProgress$.subscribe(scrollProgressHot$);
 
   //subscribe to scroll progress to paint a progress bar
@@ -33,8 +33,6 @@ export default () => {
   const subscription2 = scrollProgressHot$.subscribe(val => {
     updateDisplay(`${Math.floor(val)} %`);
   });
-
-  scrollProgressHot$.next(0);
 
   /** end coding */
 };
