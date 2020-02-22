@@ -1,6 +1,6 @@
 import { updateDisplay } from "./utils";
 import { fromEvent } from "rxjs";
-import { map, tap, sampleTime, auditTime, throttleTime } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 
 export default () => {
   /** start coding */
@@ -14,27 +14,7 @@ export default () => {
   };
 
   //observable that returns scroll (from top) on scroll events
-
-  //   sampleTime
-  //   const scroll$ = fromEvent(document, "scroll").pipe(
-  //     tap(evt => console.log("scroll event")),
-  //     sampleTime(50),
-  //     map(() => docElement.scrollTop),
-  //     tap(evt => console.log("[scroll]: ", evt))
-  //   );
-
-  //   auditTime
-  //   const scroll$ = fromEvent(document, "scroll").pipe(
-  //     tap(evt => console.log("scroll event")),
-  //     auditTime(50),
-  //     map(() => docElement.scrollTop),
-  //     tap(evt => console.log("[scroll]: ", evt))
-  //   );
-
-  //   throttleTime
   const scroll$ = fromEvent(document, "scroll").pipe(
-    tap(evt => console.log("scroll event")),
-    throttleTime(50),
     map(() => docElement.scrollTop),
     tap(evt => console.log("[scroll]: ", evt))
   );
