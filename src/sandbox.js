@@ -1,6 +1,6 @@
 import { updateDisplay } from "./utils";
 import { fromEvent } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { map, tap, delay, bufferTime } from "rxjs/operators";
 
 export default () => {
   /** start coding */
@@ -20,11 +20,30 @@ export default () => {
   );
 
   //observable that returns the amount of page scroll progress
+  //   const scrollProgress$ = scroll$.pipe(
+  //     map(evt => {
+  //       const docHeight = docElement.scrollHeight - docElement.clientHeight;
+  //       return (evt / docHeight) * 100;
+  //     }),
+  //     delay(500)
+  //   );
+
+  // const scrollProgress$ = scroll$.pipe(
+  //   map(evt => {
+  //     const docHeight = docElement.scrollHeight - docElement.clientHeight;
+  //     return (evt / docHeight) * 100;
+  //   }),
+  //   bufferTime(500),
+  //   tap(value => console.log(value))
+  // );
+
   const scrollProgress$ = scroll$.pipe(
     map(evt => {
       const docHeight = docElement.scrollHeight - docElement.clientHeight;
       return (evt / docHeight) * 100;
-    })
+    }),
+    bufferTime(50, 1000),
+    tap(value => console.log(value))
   );
 
   //subscribe to scroll progress to paint a progress bar
