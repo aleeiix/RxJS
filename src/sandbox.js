@@ -1,6 +1,6 @@
 import { updateDisplay, displayLog } from "./utils";
-import { fromEvent } from "rxjs";
-import { map } from "rxjs/operators";
+import { fromEvent, zip, merge } from "rxjs";
+import { map, tap, scan, filter, distinctUntilChanged } from "rxjs/operators";
 
 export default () => {
   /** start coding */
@@ -60,6 +60,41 @@ export default () => {
   );
 
   //TODO: draw current line
+
+  //   const drawLine$ = zip(mouseStart$, mouseEnd$).pipe(
+  //     tap(console.log),
+  //     map(([start, end]) => {
+  //       return {
+  //         origin: start.coords,
+  //         end: end.coords
+  //       };
+  //     })
+  //   );
+  const computeDrawState = (prev, evt) => {
+    switch (prev.label) {
+      case "init":
+      case "end":
+        if (evt.label === "start") {
+          return { origin: evt.coords, ...evt };
+        }
+        break;
+
+      case "start":
+      case "drawing":
+        return { origin: prev.origin, ...evt };
+    }
+
+    return prev;
+  };
+
+  const drawLine$ = merge(mouseStart$, mouseMove$, mouseEnd$).pipe(
+    scan(computeDrawState, { label: "init" }),
+    filter(data => data.origin && data.coords),
+    distinctUntilChanged(),
+    tap(console.log)
+  );
+
+  drawLine$.subscribe(data => drawLine(data.origin, data.coords));
 
   /** end coding */
 };
