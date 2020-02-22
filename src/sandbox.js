@@ -1,100 +1,34 @@
 import { updateDisplay, displayLog } from "./utils";
-import { fromEvent, zip, merge } from "rxjs";
-import { map, tap, scan, filter, distinctUntilChanged } from "rxjs/operators";
+import { api } from "./api";
+import { merge, fromEvent } from "rxjs";
+import { map, endWith } from "rxjs/operators";
 
 export default () => {
   /** start coding */
 
-  /** init canvas and context reference  */
-  const canvas = document.getElementById("drawboard");
-  const ctx = canvas.getContext("2d");
+  const button = document.getElementById("btn");
 
-  /** method to draw a line in canvas  */
-  const drawLine = (initCoords, endCoords) => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.moveTo(initCoords.x, initCoords.y);
-    ctx.lineTo(endCoords.x, endCoords.y);
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.closePath();
+  /** get 4 consecutive comments */
+  const getComments = () => {
+    //get observables from fake REST API.
+    const comment1$ = api.getComment(1);
+    const comment2$ = api.getComment(2);
+    const comment3$ = api.getComment(3);
+    const comment4$ = api.getComment(4);
+
+    //subscribe to all the observables to get and display comments
+    merge(comment1$, comment2$, comment3$, comment4$)
+      .pipe(
+        map(({ id, comment }) => `#${id} - ${comment}`),
+        endWith("--------//--------")
+      )
+      .subscribe(data => {
+        displayLog(data);
+      });
   };
 
-  /** helper method to retrieve local coords from click */
-  const getLocalClickCoords = (event, parent) => {
-    return {
-      x: event.clientX - parent.offsetLeft,
-      y: event.clientY - parent.offsetTop
-    };
-  };
-
-  /** observable from canvas mouse down events */
-  const mouseStart$ = fromEvent(canvas, "mousedown").pipe(
-    map(event => {
-      return {
-        label: "start",
-        coords: getLocalClickCoords(event, canvas)
-      };
-    })
-  );
-
-  /** observable from canvas mouse up events */
-  const mouseEnd$ = fromEvent(canvas, "mouseup").pipe(
-    map(event => {
-      return {
-        label: "end",
-        coords: getLocalClickCoords(event, canvas)
-      };
-    })
-  );
-
-  /** observable from canvas mouse move events */
-  const mouseMove$ = fromEvent(canvas, "mousemove").pipe(
-    map(event => {
-      return {
-        label: "drawing",
-        coords: getLocalClickCoords(event, canvas)
-      };
-    })
-  );
-
-  //TODO: draw current line
-
-  //   const drawLine$ = zip(mouseStart$, mouseEnd$).pipe(
-  //     tap(console.log),
-  //     map(([start, end]) => {
-  //       return {
-  //         origin: start.coords,
-  //         end: end.coords
-  //       };
-  //     })
-  //   );
-  const computeDrawState = (prev, evt) => {
-    switch (prev.label) {
-      case "init":
-      case "end":
-        if (evt.label === "start") {
-          return { origin: evt.coords, ...evt };
-        }
-        break;
-
-      case "start":
-      case "drawing":
-        return { origin: prev.origin, ...evt };
-    }
-
-    return prev;
-  };
-
-  const drawLine$ = merge(mouseStart$, mouseMove$, mouseEnd$).pipe(
-    scan(computeDrawState, { label: "init" }),
-    filter(data => data.origin && data.coords),
-    distinctUntilChanged(),
-    tap(console.log)
-  );
-
-  drawLine$.subscribe(data => drawLine(data.origin, data.coords));
+  /** get comments on button click */
+  fromEvent(button, "click").subscribe(getComments);
 
   /** end coding */
 };
