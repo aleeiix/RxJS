@@ -9,10 +9,18 @@ export default () => {
   const button = document.getElementById("btn");
 
   /** get comments on button click */
+  // fromEvent(button, 'click').pipe(
+  //     scan((acc, evt) => acc + 1, 0),
+  //     concatMap(page => api.getCommentsList(page)),
+  //     map(JSON.stringify),
+  //     tap(console.log),
+  // ).subscribe(displayLog);
+
   fromEvent(button, "click")
     .pipe(
       scan((acc, evt) => acc + 1, 0),
       concatMap(page => api.getCommentsList(page)),
+      mergeMap(comments => from(comments)),
       map(JSON.stringify),
       tap(console.log)
     )
