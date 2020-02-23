@@ -1,7 +1,7 @@
 import { updateDisplay, displayLog } from "./utils";
 
-import { fromEvent } from "rxjs";
-import { map, debounceTime } from "rxjs/operators";
+import { fromEvent, combineLatest } from "rxjs";
+import { map, debounceTime, withLatestFrom } from "rxjs/operators";
 
 export default () => {
   /** start coding */
@@ -23,6 +23,19 @@ export default () => {
     map(evt => evt.target.value)
   );
   const submitButton$ = fromEvent(form.btn, "click");
+
+  //   const formData$ = combineLatest(formName$, formEmail$, formNumber$);
+  //   formData$.subscribe(displayLog);
+
+  const formData$ = submitButton$.pipe(
+    withLatestFrom(formName$, formEmail$, formNumber$),
+    map(data => {
+      const [click, ...formData] = data;
+      return formData;
+    })
+  );
+
+  formData$.subscribe(displayLog);
 
   /** end coding */
 };
