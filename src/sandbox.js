@@ -1,38 +1,32 @@
-import { updateDisplay, displayLog } from "./utils";
-import { api } from "./api";
-import { fromEvent } from "rxjs";
-import { map, scan, tap, concatMap, catchError, retry } from "rxjs/operators";
+import { updateDisplay } from "./utils";
+import { fromEvent, interval } from "rxjs";
+import { mapTo, scan, takeWhile } from "rxjs/operators";
 
 export default () => {
   /** start coding */
 
-  const button = document.getElementById("btn");
+  /** number of seconds to init countdown */
+  const countdownSeconds = 10;
+
+  /** access interface buttons */
+  const pauseButton = document.getElementById("pause-btn");
+  const resumeButton = document.getElementById("resume-btn");
 
   /** get comments on button click */
-  //   fromEvent(button, "click")
-  //     .pipe(
-  //       scan((acc, evt) => acc + 1, 0),
-  //       concatMap(id =>
-  //         api.getComment(id).pipe(
-  //           catchError((err, src$) => {
-  //             console.log("CATCH!");
-  //             return src$;
-  //           })
-  //         )
-  //       ),
-  //       map(JSON.stringify),
-  //       tap(console.log)
-  //     )
-  //     .subscribe(displayLog, err => console.log("ERROR ==> ", err.message));
+  const pause$ = fromEvent(pauseButton, "click");
+  const resume$ = fromEvent(resumeButton, "click");
 
-  fromEvent(button, "click")
-    .pipe(
-      scan((acc, evt) => acc + 1, 0),
-      concatMap(id => api.getComment(id).pipe(retry(3))),
-      map(JSON.stringify),
-      tap(console.log)
-    )
-    .subscribe(displayLog, err => console.log("ERROR ==> ", err.message));
+  /** 1s negative interval */
+  const interval$ = interval(1000).pipe(mapTo(-1));
+
+  /** countdown timer */
+  const countdown$ = interval$.pipe(
+    scan((acc, curr) => (curr ? curr + acc : curr), countdownSeconds),
+    takeWhile(v => v >= 0)
+  );
+
+  /** subscribe to countdown */
+  countdown$.subscribe(updateDisplay);
 
   /** end coding */
 };

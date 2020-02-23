@@ -5,9 +5,9 @@ export class api {
   static getComment(id) {
     return timer(Math.random() * 1000).pipe(
       mergeMap(evt => {
-        const isError = Math.random() > 0.2 ? true : false;
+        const isError = Math.random() > 0.1 ? true : false;
         if (isError) {
-          return throwError(new Error("Request Time Out"));
+          return throwError(new Error("Request Timeout"));
         } else {
           return of({ id: id, comment: `comment number ${id}` });
         }
